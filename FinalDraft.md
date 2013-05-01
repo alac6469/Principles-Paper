@@ -90,3 +90,21 @@ In a response to Matt Malones "The Mystery Of The Parameterized Array," Steve sa
 This seems to work now as expected. It even uses a primitive int array underneath, so toString produces “a: ArrayWrapper[Int] = [I@4723646″.
 >
 >Thanks!
+
+In Jesse Eicher's, Daily Scala, he wrote a blog post called "Scala 2.8 Arrays are not Traversables." In this post he points out many pros and also some cons on the new implelemtation of the Scala Array. As the title of the post infers, his main concern with the new Scala Arrays is that they are non-traversable. He shoes this in an example:
+
+~~~~~
+scala> def x(t:Traversable[Int]) = t match {
+     | case x : Array[Int] => true          
+     | }
+     
+ <console>:13: error: pattern type is incompatible with expected type;
+ found   : Array[Int]
+ required: Traversable[Int]
+       case x : Array[Int] => true
+                ^
+ <console>:13: error: type mismatch;
+ found   : Array[Int]
+ required: Traversable[Int]
+       case x : Array[Int] => true
+~~~~~
