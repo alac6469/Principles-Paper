@@ -65,7 +65,8 @@ Another potential solution that was discussed involved wrapping Java-like arrays
 "abc" != "abc".reverse.reverse       
 ~~~~~
 
-"The problem here was that the reverse method was inherited from class Seq where it was defined to return another Seq. Since strings are not sequences, the only feasible type reverse could return when called on a String was RichString. But then the equals method on Strings which is inherited from Java would not recognize that a String could be equal to a RichString," says Martin Odersky. We can see that the same problems will only occur in conversions between an Array and a similar RichArray type. So, this is not a feasible solution.
+>The problem here was that the reverse method was inherited from class Seq where it was defined to return another Seq. Since strings are not sequences, the only feasible type reverse could return when called on a String was RichString. But then the equals method on Strings which is inherited from Java would not recognize that a String could be equal to a RichString. Martin Odersky 
+We can see that the same problems will only occur in conversions between an Array and a similar RichArray type. So, this is not a feasible solution.
 
 The Solution
 ============
