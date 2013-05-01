@@ -65,7 +65,7 @@ Another potential solution that was discussed involved wrapping Java-like arrays
 "abc" != "abc".reverse.reverse       
 ~~~~~
 
->The problem here was that the reverse method was inherited from class Seq where it was defined to return another Seq. Since strings are not sequences, the only feasible type reverse could return when called on a String was RichString. But then the equals method on Strings which is inherited from Java would not recognize that a String could be equal to a RichString. Martin Odersky 
+>The problem here was that the reverse method was inherited from class Seq where it was defined to return another Seq. Since strings are not sequences, the only feasible type reverse could return when called on a String was RichString. But then the equals method on Strings which is inherited from Java would not recognize that a String could be equal to a RichString. (Martin Odersky) 
 
 We can see that the same problems will only occur in conversions between an Array and a similar RichArray type. So, this is not a feasible solution.
 
@@ -80,3 +80,13 @@ Scala arrays are integrated into new framework via two implicit conversions. The
         
 
 Given the two implicit conversions, there is a balancing as to which is called. The conversion to ArrayOps has precedence, but in some cases an array needs to be converted to a sequence, instead of a sequence method just being called on it. In that case, the WrappedArray conversion is used. This precedence is defined by the policy that: “When comparing two different applicable alternatives of an overloaded method or of an implicit, each method gets one point for having more specific arguments, and another point for being defined in a proper subclass. An alternative 'wins' over another if it gets a greater number of points in these two comparisons.” As ArrayOps is placed in the Predef object, and WrappedArray is in the LowPriorityImplicits class inherited from Predef, WrappedArray will only be used if it's definitely needed.
+
+How This Was Recieved
+=====================
+
+In a response to Matt Malones "The Mystery Of The Parameterized Array," Steve said,
+
+>July 12, 2011 at 7:55 am
+This seems to work now as expected. It even uses a primitive int array underneath, so toString produces “a: ArrayWrapper[Int] = [I@4723646″.
+>
+>Thanks!
