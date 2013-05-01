@@ -23,14 +23,43 @@ scala> val a = new ArrayWrapper[Int](5)
 a: ArrayWrapper[Int] = Array(null, null, null, null, null)
 ~~~~~~
 
-The val a should be initialized to Array(0, 0, 0, 0, 0), as that is what you get when you initialize a regular Array[Int]. But when the compiler initializes the array inside the wrapper, the array has been converted from array[Int] to an array of java.lang.Integer, which is an object. And the default value of an object is null, not 0. So val a contains nulls. This is but one example of the unobvious behaviours associated with Scala 2.7 the boxed/unboxed array implementation.
+The val a should be initialized to Array(0, 0, 0, 0, 0), as that is what you get when you initialize a regular Array[Int]. But when the compiler initializes the array inside the wrapper, the array has been converted from array[Int] to an array of java.lang.Integer, which is an object. And the default value of an object is null, not 0. So val a contains nulls. 
 
-  Throughout the Scala Improvement Process, there were a few ways that were presented as possibilities for solving the aforementioned issues with arrays in Scala 2.7.  One such way was to create two different implementations of array.  In one implementation, there would be the Java representation for interoperation.  This implementation would have all of the same traits as an array in Java and have a quick runtime.  The other implementation would be the Scala representation for use in the collection hierarchy.  One advantage of this second implementation would be that it would have all of the easy-to-use methods for such things as indexing and manipulation.  In an ideal world, these two implementations should be interchangeable, with the first one having the performance boost, and the second one being more flexible.  However, issues arise when thinking about what would occur with this method when very large pieces of code are being used.  Because of the fact that a developer would have to determine which implementation of the array to use, discrepancies could occur if people who are working on the same code choose to use opposite implementations.  This could become very complicated as the various chunks of code from different programmers are brought together to complete a program.
-Another potential solution that was discussed involved wrapping Java-like arrays in Scala arrays.  Therefore, the native arrays would go through a conversion that would essentially make them a part of Scala’s collection hierarchy.  By doing this, the uncertainty that arises from having two separate implementations is avoided.  In this context, native arrays would have the same implementation as new Scala arrays; however, they would still have the same performance capabilities as Java Arrays. 
+Now observe the following code:
 
-//Finish this paragraph…remember to talk about string/RichString
+~~~~~
+scala> val x = a(0)
+x: Int = 0
+ 
+scala> x.toString
+res0: java.lang.String = 0
 
-//string/RichString is an example of another proposal that didn't really work out.
+scala> a(0).toString
+java.lang.NullPointerException
+       at .<init>(<console>:7)
+       at .<clinit>(<console>)
+       at RequestResult$.<init>(<console>:3)
+       at RequestResult$.<clinit>(<console>)
+       at RequestResult$result(<console>)
+       at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+       at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+       at sun.reflect.DelegatingMethodAccessorImpl.i...
+~~~~~
+
+The val x is initially seen to be 0, and there is no problem when converting this to a string. However, when a(0) is converted to a string, we get a NullPointerException. The reason for these ambiguities is because in Scala 2.7, when arrays are implemented with parameterized types, the arrays are actually Java objects. So, when running different methods on the array, possible interferences can occur that will produce odd results that could be almost impossible to debug. These are but examples of the unobvious behaviours associated with Scala 2.7 the boxed/unboxed array implementation.
+
+  Throughout the Scala Improvement Process, there were a few ways that were presented as possibilities for solving the aforementioned issues with arrays in Scala 2.7.  One such way was to create two different implementations of array.  In one implementation, there would be the Java representation for interoperation.  This implementation would have all of the same traits as an array in Java and have a quick runtime.  The other implementation would be the Scala representation for use in the collection hierarchy.  One advantage of this second implementation would be that it would have all of the easy-to-use methods for such things as indexing and manipulation.  In an ideal world, these two implementations should be interchangeable, with the first one having the performance boost, and the second one being more flexible.  However, issues arise when thinking about what would occur with this method when very large pieces of code are being used.  Because a developer would need to determine a specific implementation of the array to use, discrepancies will most likely occur when people who are working on the same code choose to use opposite implementations.  This could become very complicated and problematic as the various pieces of code from different programmers, and different implementations, are brought together and tried to be compiled. For example, consider the following code:
+
+  ~~~~~~
+
+Another potential solution that was discussed involved wrapping Java-like arrays in Scala arrays.  Therefore, the native arrays would go through a conversion that would essentially make them a part of Scala’s collection hierarchy.  By doing this, the uncertainty that arises from having two separate implementations is avoided.  In this context, native arrays would have the same implementation as new Scala arrays; however, they would still have the same performance capabilities as Java Arrays. However, the same thing had been done with conversions between Scala's String and RichString, and many problems arose. Take for example the following code:
+
+~~~~~
+"abc".reverse.reverse == "abc"
+"abc" != "abc".reverse.reverse       
+~~~~~
+
+This is very odd. When we check if "abc" reversed twice is equal to "abc", we do not get the same results when checking if "abc" is equal to "abc" reversed twice. The problem here is that, the function reverse returns a RichString when called on a String. So, when we check if it is then equal to a String, we get false. We can see that the same problems will only occur in conversions between an Array and a RichArray type. So, this is not a feasible solution.
 
 In the Scala 2.8 version of Scala Collections, there is a new collections framework which “accompanies collection traits such as Seq with implementation traits that abstract over the representation of the collection.” This allows the base trait to inherit its essential operations from the abstract trait that is instantiated depending on the representation type. Using this new framework, scala arrays can get the speed of the java arrays without sacrificing its place in the collection hierarchy.
 
