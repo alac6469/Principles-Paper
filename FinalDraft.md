@@ -1,8 +1,11 @@
+# Scala 2.8 Array's And Their Developement
 Bobby Crimi, Alex Ackerman, Richard Green
 =========================================
-
 SID-7
 -----
+
+In The Past
+-----------
 
   In 2008, there was a great deal of discussion regarding the use of arrays in Scala 2.7.  To the non-expert eye, it would appear that they were simply the same as Java arrays.  However, this is simply not the case, and if used incorrectly, they can negatively impact performance.  The key issues with Scala 2.7 stemmed from the fact that ideally, Scala arrays would have the same representation as in Java so that the data could be used interchangeably.  Unfortunately, there are a number of reasons why the 2.7 arrays were unable to do this in light of Java’s particularly low-level representation. First off, Java has multiple array representations which is redundant and can cause a certain amount of ambiguity.  Also, while 2.7 technically did have constructors for arrays of a generic type, these constructors caused some issues, such as the fact that various data types would not function as well as using uninitialized arrays.  Lastly, there were very few effective methods for array indexing and manipulation.  This paper will continue to examine these issues, potential fixes, and what was actually implemented in subsequent releases of Scala in order to avoid some of these problems.
   
