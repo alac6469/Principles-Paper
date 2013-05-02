@@ -60,15 +60,24 @@
 					<script type="text/template">
 					##Unobvious Example
 
-						  class ArrayWrapper[A](length: Int) {
-						  private val array = new Array[A](length)
-						  def apply(x: Int) = array(x)
-						  def update(x: Int, value: A) = array(x) = value
-						  override def toString(): String = array.toString
-						}
+						~~~~~
+						scala> val x = a(0)
+						x: Int = 0
+ 
+						scala> x.toString
+						res0: java.lang.String = 0
 
-						scala> val a = new ArrayWrapper[Int](5)
-						a: ArrayWrapper[Int] = Array(null, null, null, null, null)
+						scala> a(0).toString
+						java.lang.NullPointerException
+       						at .<init>(<console>:7)
+       						at .<clinit>(<console>)
+						at RequestResult$.<init>(<console>:3)
+       						at RequestResult$.<clinit>(<console>)
+       						at RequestResult$result(<console>)
+       						at sun.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+       						at sun.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:39)
+       						at sun.reflect.DelegatingMethodAccessorImpl.i...
+       						~~~~~
 
 					[source](http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/)
 
