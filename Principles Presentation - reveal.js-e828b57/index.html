@@ -39,306 +39,181 @@
 
 				<section data-markdown>
 					<script type="text/template">
-						## Scala Arrays
-
-						By Richard Green
+						## Scala 2.8 Arrays And Their Developement
+						By Bobby Crimi, Alex Ackerman, Richard Green
 
 					</script>
-				</section>
-
-				<section>
-					<h2>Heads Up</h2>
-					<p>
-						reveal.js is a framework for easily creating beautiful presentations using HTML. You'll need a browser with
-						support for CSS 3D transforms to see it in its full glory.
-					</p>
-
-					<aside class="notes">
-						Oh hey, these are some notes. They'll be hidden in your presentation, but you can see them if you open the speaker notes window (hit 's' on your keyboard).
-					</aside>
-				</section>
-
-				<!-- Example of nested vertical slides -->
-				<section>
-					<section>
-						<h2>Vertical Slides</h2>
-						<p>
-							Slides can be nested inside of other slides,
-							try pressing <a href="#" class="navigate-down">down</a>.
-						</p>
-						<a href="#" class="image navigate-down">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
-					</section>
-					<section>
-						<h2>Basement Level 1</h2>
-						<p>Press down or up to navigate.</p>
-					</section>
-					<section>
-						<h2>Basement Level 2</h2>
-						<p>Cornify</p>
-						<a class="test" href="http://cornify.com">
-							<img width="280" height="326" src="https://s3.amazonaws.com/hakim-static/reveal-js/cornify.gif" alt="Unicorn">
-						</a>
-					</section>
-					<section>
-						<h2>Basement Level 3</h2>
-						<p>That's it, time to go back up.</p>
-						<a href="#/2" class="image">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Up arrow" style="-webkit-transform: rotate(180deg);">
-						</a>
-					</section>
-				</section>
-
-				<section>
-					<h2>Point of View</h2>
-					<p>
-						Press <strong>ESC</strong> to enter the slide overview. Hold down alt and click on any element to zoom in on it using <a href="http://lab.hakim.se/zoom-js">zoom.js</a>. Alt + click anywhere to zoom back out.
-					</p>
-				</section>
-
-				<section>
-					<h2>rvl.io</h2>
-					<p>
-						If you don't like writing slides in HTML you can use the online editor <a href="http://www.rvl.io" target="_blank">rvl.io</a>.
-					</p>
-				</section>
-
-				<section>
-					<h2>Works in Mobile Safari</h2>
-					<p>
-						Try it out! You can swipe through the slides and pinch your way to the overview.
-					</p>
-				</section>
-
-				<section>
-					<h2>Marvelous Unordered List</h2>
-					<ul>
-						<li>No order here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-						<li>Or here</li>
-					</ul>
-				</section>
-
-				<section>
-					<h2>Fantastic Ordered List</h2>
-					<ol>
-						<li>One is smaller than...</li>
-						<li>Two is smaller than...</li>
-						<li>Three!</li>
-					</ol>
 				</section>
 
 				<section data-markdown>
 					<script type="text/template">
-						## Markdown support
+						## In the Past
+						* Java only supports primitive and object array types
+						* Scala needs to support arrays of generic types
+						* Converted between array and BoxedArray types
+							* Caused many errors and unobvious behaviors.
 
-						For those of you who like that sort of thing. Instructions and a bit more info available [here](https://github.com/hakimel/reveal.js#markdown).
-
-							<section data-markdown>
-							  ## Markdown support
-
-							  For those of you who like that sort of thing.
-							  Instructions and a bit more info available [here](https://github.com/hakimel/reveal.js#markdown).
-							</section>
 					</script>
 				</section>
 
-				<section id="transitions">
-					<h2>Transition Styles</h2>
-					<p>
-						You can select from different transitions, like: <br>
-						<a href="?transition=cube#/transitions">Cube</a> -
-						<a href="?transition=page#/transitions">Page</a> -
-						<a href="?transition=concave#/transitions">Concave</a> -
-						<a href="?transition=zoom#/transitions">Zoom</a> -
-						<a href="?transition=linear#/transitions">Linear</a> -
-						<a href="?transition=fade#/transitions">Fade</a> -
-						<a href="?transition=none#/transitions">None</a> -
-						<a href="?#/transitions">Default</a>
-					</p>
-				</section>
+				<section data-markdown>
+					<script type="text/template">
+					##Unobvious Example
 
-				<section id="themes">
-					<h2>Themes</h2>
-					<p>
-						Reveal.js comes with a few themes built in: <br>
-						<a href="?theme=sky#/themes">Sky</a> -
-						<a href="?theme=beige#/themes">Beige</a> -
-						<a href="?theme=simple#/themes">Simple</a> -
-						<a href="?theme=serif#/themes">Serif</a> -
-						<a href="?theme=night#/themes">Night</a> -
-						<a href="?#/themes">Default</a>
-					</p>
-					<p>
-						<small>
-							* Theme demos are loaded after the presentation which leads to flicker. In production you should load your theme in the <code>&lt;head&gt;</code> using a <code>&lt;link&gt;</code>.
-						</small>
-					</p>
-				</section>
+						  class ArrayWrapper[A](length: Int) {
+						  private val array = new Array[A](length)
+						  def apply(x: Int) = array(x)
+						  def update(x: Int, value: A) = array(x) = value
+						  override def toString(): String = array.toString
+						}
 
-				<section>
-					<section data-state="alert">
-						<h2>Global State</h2>
-						<p>
-							Set <code>data-state="something"</code> on a slide and <code>"something"</code>
-							will be added as a class to the document element when the slide is open. This lets you
-							apply broader style changes, like switching the background.
-						</p>
-						<a href="#" class="image navigate-down">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
-					</section>
-					<section data-state="blackout">
-						<h2>"blackout"</h2>
-						<a href="#" class="image navigate-down">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Down arrow">
-						</a>
-					</section>
-					<section data-state="soothe">
-						<h2>"soothe"</h2>
-						<a href="#" class="image navigate-next">
-							<img width="178" height="238" src="https://s3.amazonaws.com/hakim-static/reveal-js/arrow.png" alt="Up arrow" style="-webkit-transform: rotate(-90deg);">
-						</a>
-					</section>
-				</section>
+						scala> val a = new ArrayWrapper[Int](5)
+						a: ArrayWrapper[Int] = Array(null, null, null, null, null)
 
-				<section data-state="customevent">
-					<h2>Custom Events</h2>
-					<p>
-						Additionally custom events can be triggered on a per slide basis by binding to the <code>data-state</code> name.
-					</p>
-					<pre><code contenteditable style="font-size: 18px; margin-top: 20px;">Reveal.addEventListener( 'customevent', function() {
-	console.log( '"customevent" has fired' );
-} );
-					</code></pre>
-				</section>
+					[source](http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/)
 
-				<section>
-					<h2>Clever Quotes</h2>
-					<p>
-						These guys come in two forms, inline: <q cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-						The nice thing about standards is that there are so many to choose from</q> and block:
-					</p>
-					<blockquote cite="http://searchservervirtualization.techtarget.com/definition/Our-Favorite-Technology-Quotations">
-						For years there has been a theory that millions of monkeys typing at random on millions of typewriters would
-						reproduce the entire works of Shakespeare. The Internet has proven this theory to be untrue.
-					</blockquote>
-				</section>
-
-				<section>
-					<h2>Pretty Code</h2>
-					<pre><code contenteditable>
-function linkify( selector ) {
-  if( supports3DTransforms ) {
-
-    var nodes = document.querySelectorAll( selector );
-
-    for( var i = 0, len = nodes.length; i &lt; len; i++ ) {
-      var node = nodes[i];
-
-      if( !node.className ) ) {
-        node.className += ' roll';
-      }
-    };
-  }
-}
-					</code></pre>
-					<p>Courtesy of <a href="http://softwaremaniacs.org/soft/highlight/en/description/">highlight.js</a>.</p>
-				</section>
-
-				<section>
-					<h2>Intergalactic Interconnections</h2>
-					<p>
-						You can link between slides internally,
-						<a href="#/2/3">like this</a>.
-					</p>
-				</section>
-
-				<section>
-					<section>
-						<h2>Fragmented Views</h2>
-						<p>Hit the next arrow...</p>
-						<p class="fragment">... to step through ...</p>
-						<ol>
-							<li class="fragment"><code>any type</code></li>
-							<li class="fragment"><em>of view</em></li>
-							<li class="fragment"><strong>fragments</strong></li>
-						</ol>
-
-						<aside class="notes">
-							This slide has fragments which are also stepped through in the notes window.
-						</aside>
-					</section>
-					<section>
-						<h2>Fragment Styles</h2>
-						<p>There's a few styles of fragments, like:</p>
-						<p class="fragment grow">grow</p>
-						<p class="fragment shrink">shrink</p>
-						<p class="fragment roll-in">roll-in</p>
-						<p class="fragment fade-out">fade-out</p>
-						<p class="fragment highlight-red">highlight-red</p>
-						<p class="fragment highlight-green">highlight-green</p>
-						<p class="fragment highlight-blue">highlight-blue</p>
-					</section>
-				</section>
-
-				<section>
-					<h2>Spectacular image!</h2>
-					<a class="image" href="http://lab.hakim.se/meny/" target="_blank">
-						<img width="320" height="299" src="http://s3.amazonaws.com/hakim-static/portfolio/images/meny.png" alt="Meny">
-					</a>
-				</section>
-
-				<section>
-					<h2>Export to PDF</h2>
-					<p>Presentations can be <a href="https://github.com/hakimel/reveal.js#pdf-export">exported to PDF</a>, below is an example that's been uploaded to SlideShare.</p>
-					<iframe id="slideshare" src="http://www.slideshare.net/slideshow/embed_code/13872948" width="455" height="356" style="margin:0;overflow:hidden;border:1px solid #CCC;border-width:1px 1px 0;margin-bottom:5px" allowfullscreen> </iframe>
-					<script>
-						document.getElementById('slideshare').attributeName = 'allowfullscreen';
 					</script>
 				</section>
 
-				<section>
-					<h2>Take a Moment</h2>
-					<p>
-						Press b or period on your keyboard to enter the 'paused' mode. This mode is helpful when you want to take distracting slides off the screen
-						during a presentation.
-					</p>
+				<section data-markdown>
+					<script type="text/template">
+					##Attempts at a Solution
+
+					* One popular proposed solution was to have two representations of the array
+						* A java representation for interoperation and speed
+						* A scala representation for use in the Scala Collections Library
+					* Pro: Support for Scala functions, but you have access to the speed of Java
+					* Con: Different developers in a large codebase could pick different representations
+						* Could be reduced by compiler generated overloaded functions
+
+					</script>
 				</section>
 
-				<section>
-					<h2>Stellar Links</h2>
-					<ul>
-						<li><a href="https://github.com/hakimel/reveal.js">Source code on GitHub</a></li>
-						<li><a href="http://hakim.se/projects/reveal-js">Leave feedback on my site</a></li>
-						<li><a href="http://twitter.com/hakimel">Follow me on Twitter</a></li>
-					</ul>
+				<section data-markdown>
+					<script type="text/template">
+					##Another Idea
+
+					* Add conversions to native arrays
+					* Pros: 
+						* Allow for use in the Scala Collections Library
+						* Programmer wouldn't have to decide between representations
+					* Cons:
+						* Might not convert to what you'd expect
+						* String/RichString example
+
+								"abc".reverse.reverse == "abc"
+								"abc" != "abc".reverse.reverse
+
+					</script>
 				</section>
 
-				<section>
-					<h2>It's free</h2>
-					<p>
-						reveal.js and <a href="http://www.rvl.io">rvl.io</a> are entirely free but if you'd like to support the projects you can donate below.
-						Donations will go towards hosting and domain costs.
-					</p>
-					<form action="https://www.paypal.com/cgi-bin/webscr" method="post">
-						<input type="hidden" name="cmd" value="_donations">
-						<input type="hidden" name="business" value="hakim.elhattab@gmail.com">
-						<input type="hidden" name="lc" value="US">
-						<input type="hidden" name="item_name" value="reveal.js / rvl.io">
-						<input type="hidden" name="no_note" value="0">
-						<input type="hidden" name="currency_code" value="USD">
-						<input type="hidden" name="bn" value="PP-DonationsBF:btn_donate_LG.gif:NonHostedGuest">
-						<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
-					</form>
+				<section data-markdown>
+					<script type="text/template">
+					## The Solution
+
+					* Using Scala 2.8's Collection Framework, maintain traits over all objects that would use seq functions
+					* Allow the base trait to inherit all operations from the abstract trait
+					* This is what powers the array solution
+
+					</script>
 				</section>
 
-				<section>
-					<h1>THE END</h1>
-					<h3>BY Hakim El Hattab / hakim.se</h3>
+				<section data-markdown>
+					<script type="text/template">
+					## Clarification
+
+						trait SeqLike[+Elem, +Repr] { ... }
+						trait Seq[+Elem] extends ... with SeqLike[Elem, Seq[Elem]] { ... }
+					Methods such as reverse in SeqLike return Repr instead of Seq
+
+					</script>
 				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Integrating Arrays - ArrayOps
+
+					* Two implicit conversions: Array -> ArrayOps , Array -> WrappedArray
+					* ArrayOps is a subtype of VectorLike[T, Array[T]]
+						* All sequence operations available
+					* Methods yield arrays instead ArrayOps
+					* Overhead negligible
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Integrating Arrays - WrappedArray
+
+					* WrappedArray used for converting array to Seq
+					* Is a mutable vector that has a Java representation
+						* All sequence operations available
+					* Methods that need a seq use a WrappedArray and return a WrappedArray
+					* Implicit conversion between Array and WrappedArray
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Generic Array Creation
+					* Java doesn't have a uniform array representation
+					* Use a Manifest
+						* Describes type T in Array[T]
+						* Context Bound or Implicit Parameter
+						* Compiler sends type information to code at runtime
+					* Compiler automatically constructs them for statically known types
+					* Or use a GenericArray which converts the elements to Array[AnyRef]
+						* Represented as an Object[] array in Java
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Overaching Example
+						def tabulate[T](len: Int, f: Int => T)(implicit m: ClassManifest[T]) = { 
+							val xs = new Array[T](len)
+							for (i <- 0 until len) xs(i) = f(i)
+							xs
+						}
+
+						//Context Bound Version
+						def tabulate[T: ClassManifest](len: Int, f: Int => T) = { ... }
+						
+
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Pros and Cons
+
+					* Pros:
+						* Allows for generic arrays, at near Java speeds
+						* Allows you to use Seq operations on an Array
+						* Can convert from Array to Seq and back
+					* Cons:
+						* Programmers have to add manifest parameter/context bound
+						* If not a statically known type programmers must create their own manifest
+							* Or use GenericArray at the cost of speed
+						
+					</script>
+				</section>
+
+				<section data-markdown>
+					<script type="text/template">
+					## Deprecated in Scala 2.10
+					* Released in January 2013
+					* Uses TypeTags instead of Manifests
+						* Collection framework (seqLike stuff) still used
+					</script>
+				</section>
+
+
+
+				
 
 			</div>
 
