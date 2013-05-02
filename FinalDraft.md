@@ -112,3 +112,16 @@ scala> def x(t:Traversable[Int]) = t match {
 ~~~~~
 
 Here, we see the effect of the fact that the Scala 2.8 arrays are non-traversable: Jesse Eicher received a *type mismatch* error.  Again, while he was pointing out this flaw, in his blog post he also discusses a number of benefits to the new implementation.  Once again, the resounding reaction to the Scala 2.8 array implementation was that it managed to clear up a good majority of the issues that the prior version was causing.  The writers of Scala certainly did an impressive job of pleasing the members of the Scala programming community.
+
+Works Cited
+=====================
+
+http://docs.scala-lang.org/sips/completed/scala-2-8-arrays.html
+
+http://www.drmaciver.com/2008/06/scala-arrays/
+
+http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/
+
+http://www.drmaciver.com/repos/scala-arrays/sip-arrays.xhtml
+
+http://daily-scala.blogspot.com/2010/04/scala-28-arrays-are-not-traversables.html
