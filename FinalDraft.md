@@ -96,19 +96,12 @@ Clearly, this user is happy with the fact that his code behaves as expected.
 While a large majority of users appreciated the improvement to arrays in Scala 2.8, there were certainly some people who found a few flaws in the new implementation. For instance, in Jesse Eicher's, Daily Scala, he wrote a blog post called "Scala 2.8 Arrays are not Traversables." In this post he points out many pros and also some cons on the new implementation of the Scala Array. As the title of the post infers, his main concern with the new Scala Arrays is that they are non-traversable. He shows this in an example:
 
 ~~~~~
-scala> def x(t:Traversable[Int]) = t match {
-     | case x : Array[Int] => true          
-     | }
-     
- <console>:13: error: pattern type is incompatible with expected type;
- found   : Array[Int]
- required: Traversable[Int]
-       case x : Array[Int] => true
-                ^
- <console>:13: error: type mismatch;
- found   : Array[Int]
- required: Traversable[Int]
-       case x : Array[Int] => true
+scala> def x(t:Traversable[Int]) = t.isInstanceOf[Array[_]]
+x: (t: Traversable[Int])Boolean
+
+scala> x(Array(1,2,3))                                     
+res24: Boolean = false
+
 ~~~~~
 
 Here, we see the effect of the fact that the Scala 2.8 arrays are non-traversable: Jesse Eicher received a *type mismatch* error.  Again, while he was pointing out this flaw, in his blog post he also discusses a number of benefits to the new implementation.  Once again, the resounding reaction to the Scala 2.8 array implementation was that it managed to clear up a good majority of the issues that the prior version was causing.  The writers of Scala certainly did an impressive job of pleasing the members of the Scala programming community.
