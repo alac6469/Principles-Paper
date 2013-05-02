@@ -1,4 +1,4 @@
-# Scala 2.8 Array's And Their Developement
+# Scala 2.8 Arrays And Their Developement
 Bobby Crimi, Alex Ackerman, Richard Green
 =========================================
 SID-7
