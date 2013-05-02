@@ -51,14 +51,14 @@ java.lang.NullPointerException
        at sun.reflect.DelegatingMethodAccessorImpl.i...
 ~~~~~
 
-"Ouch! NullPointerException! This is an unpleasant surprise." says Matt Malone. The val x is initially seen to be 0, and there is no problem when converting this to a string. However, when a(0) is converted to a string, we get a NullPointerException. The reason for these ambiguities is because in Scala 2.7, when arrays are implemented with parameterized types, the arrays are actually Java objects. So, when running different methods on the array, possible interferences can occur that will produce odd results that could be almost impossible to debug. These are but examples of the unobvious behaviours associated with Scala 2.7 the boxed/unboxed array implementation.
+"Ouch! NullPointerException! This is an unpleasant surprise." says Matt Malone. The val x is initially seen to be 0, and there is no problem when converting this to a string. However, when a(0) is converted to a string, we get a NullPointerException. The reason for these ambiguities is because in Scala 2.7, when arrays are implemented with parameterized types, the arrays are actually Java objects. So, when running different methods on the array, possible interferences can occur that will produce odd results that could be almost impossible to debug. These are but examples of the unobvious behaviors associated with Scala 2.7 in the boxed/unboxed array implementation.
 
 Attempts At A Solution
 ----------------------
 
   Throughout the Scala Improvement Process, there were a few ways that were presented as possibilities for solving the aforementioned issues with arrays in Scala 2.7.  One such way was to create two different implementations of an array.  In one implementation, there would be the Java representation for interoperation.  This implementation would have all of the same traits as an array in Java and have a quick runtime.  The other implementation would be the Scala representation for use in the collection hierarchy.  One advantage of this second implementation would be that it would have all of the easy-to-use methods for such things as indexing and manipulation.  In an ideal world, these two implementations should be interchangeable, with the first one having the performance boost, and the second one being more flexible.  However, issues arise when thinking about what would occur with this method when very large pieces of code are being used.  Because a developer would need to determine a specific implementation of the array to use, discrepancies will most likely occur when people who are working on the same code choose to use opposite implementations.  This could become very complicated and problematic as the various pieces of code from different programmers, and different implementations, are brought together and tried to be compiled. For example, consider the following code:
 
-Another potential solution that was discussed involved wrapping Java-like arrays in Scala arrays.  Therefore, the native arrays would go through a conversion that would essentially make them a part of Scala’s collection hierarchy.  By doing this, the uncertainty that arises from having two separate implementations is avoided.  In this context, native arrays would have the same implementation as new Scala arrays; however, they would still have the same performance capabilities as Java Arrays. However, the same thing had been done with conversions between Scala's String and RichString, and many problems arose. Take for example the following code:
+Another potential solution that was discussed involved wrapping Java-like arrays in Scala arrays.  Therefore, the native arrays would go through a conversion that would essentially make them a part of Scala’s collection hierarchy.  By doing this, the uncertainty that arises from having two separate implementations is avoided.  In this context, native arrays would have the same implementation as new Scala arrays; however, they would still have the same performance capabilities as Java Arrays. However, the same thing had been done with conversions between Scala's String and RichString, and many problems arose.
 
 ~~~~~
 "abc".reverse.reverse == "abc"
@@ -81,17 +81,19 @@ Scala arrays are integrated into new framework via two implicit conversions. The
 
 Given the two implicit conversions, there is a balancing as to which is called. The conversion to ArrayOps has precedence, but in some cases an array needs to be converted to a sequence, instead of a sequence method just being called on it. In that case, the WrappedArray conversion is used. This precedence is defined by the policy that: “When comparing two different applicable alternatives of an overloaded method or of an implicit, each method gets one point for having more specific arguments, and another point for being defined in a proper subclass. An alternative 'wins' over another if it gets a greater number of points in these two comparisons.” As ArrayOps is placed in the Predef object, and WrappedArray is in the LowPriorityImplicits class inherited from Predef, WrappedArray will only be used if it's definitely needed.
 
-How This Was Recieved
+How This Was Received
 =====================
 
-In a response to Matt Malones "The Mystery Of The Parameterized Array," Steve said,
+The overall response to the change in Scala arrays was positive.  While it is essentially impossible to please all members of any programming community with a language change, the implementation of arrays in Scala 2.8 was met with widespread approval. In a response to Matt Malones "The Mystery Of The Parameterized Array," Steve said,
 
 >July 12, 2011 at 7:55 am
 This seems to work now as expected. It even uses a primitive int array underneath, so toString produces “a: ArrayWrapper[Int] = [I@4723646″.
 >
 >Thanks!
 
-In Jesse Eicher's, Daily Scala, he wrote a blog post called "Scala 2.8 Arrays are not Traversables." In this post he points out many pros and also some cons on the new implelemtation of the Scala Array. As the title of the post infers, his main concern with the new Scala Arrays is that they are non-traversable. He shoes this in an example:
+Clearly, this user is happy with the fact that his code behaves as expected.
+
+While a large majority of users appreciated the improvement to arrays in Scala 2.8, there were certainly some people who found a few flaws in the new implementation. For instance, in Jesse Eicher's, Daily Scala, he wrote a blog post called "Scala 2.8 Arrays are not Traversables." In this post he points out many pros and also some cons on the new implementation of the Scala Array. As the title of the post infers, his main concern with the new Scala Arrays is that they are non-traversable. He shows this in an example:
 
 ~~~~~
 scala> def x(t:Traversable[Int]) = t match {
@@ -108,3 +110,5 @@ scala> def x(t:Traversable[Int]) = t match {
  required: Traversable[Int]
        case x : Array[Int] => true
 ~~~~~
+
+Here, we see the effect of the fact that the Scala 2.8 arrays are non-traversable: Jesse Eicher received a *type mismatch* error.  Again, while he was pointing out this flaw, in his blog post he also discusses a number of benefits to the new implementation.  Once again, the resounding reaction to the Scala 2.8 array implementation was that it managed to clear up a good majority of the issues that the prior version was causing.  The writers of Scala certainly did an impressive job of pleasing the members of the Scala programming community.
