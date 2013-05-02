@@ -60,7 +60,14 @@
 					<script type="text/template">
 					##Unobvious Example
 
-						~~~~~
+						
+						class ArrayWrapper[A](length: Int) {
+  						private val array = new Array[A](length)
+  						def apply(x: Int) = array(x)
+  						def update(x: Int, value: A) = array(x) = value
+  						override def toString(): String = array.toString
+						}
+						
 						scala> val x = a(0)
 						x: Int = 0
  
@@ -70,7 +77,7 @@
 						scala> a(0).toString
 						java.lang.NullPointerException
        							{...}
-       						~~~~~
+       						
 
 					[source](http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/)
 
