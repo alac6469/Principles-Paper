@@ -10,7 +10,7 @@ In The Past
   In 2008, there was a great deal of discussion regarding the use of arrays in Scala 2.7.  To the non-expert eye, it would appear that they were simply the same as Java arrays.  However, this is simply not the case, and if used incorrectly, they can negatively impact performance.  The key issues with Scala 2.7 stemmed from the fact that ideally, Scala arrays would have the same representation as in Java so that the data could be used interchangeably.  Unfortunately, there are a number of reasons why the 2.7 arrays were unable to do this in light of Java’s particularly low-level representation. First off, Java has multiple array representations which is redundant and can cause a certain amount of ambiguity.  Also, while 2.7 technically did have constructors for arrays of a generic type, these constructors caused some issues, such as the fact that various data types would not function as well as using uninitialized arrays.  Lastly, there were very few effective methods for array indexing and manipulation.  This paper will continue to examine these issues, potential fixes, and what was actually implemented in subsequent releases of Scala in order to avoid some of these problems.
   
   
-Take the following code as an example:   
+Take the following code from Matt Malone's [blog](http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/) as an example:   
   
 ~~~~~
   class ArrayWrapper[A](length: Int) {
@@ -30,7 +30,7 @@ a: ArrayWrapper[Int] = Array(null, null, null, null, null)
 
 The val a should be initialized to Array(0, 0, 0, 0, 0), as that is what you get when you initialize a regular Array[Int]. But when the compiler initializes the array inside the wrapper, the array has been converted from array[Int] to an array of java.lang.Integer, which is an object. And the default value of an object is null, not 0. So val a contains nulls. 
 
-Now observe the following code:
+Now observe the following code from [MacIver](http://www.drmaciver.com/2008/06/scala-arrays/):
 
 ~~~~~
 scala> val x = a(0)
@@ -65,7 +65,7 @@ Another potential solution that was discussed involved wrapping Java-like arrays
 "abc" != "abc".reverse.reverse       
 ~~~~~
 
->The problem here was that the reverse method was inherited from class Seq where it was defined to return another Seq. Since strings are not sequences, the only feasible type reverse could return when called on a String was RichString. But then the equals method on Strings which is inherited from Java would not recognize that a String could be equal to a RichString. (Martin Odersky) 
+This doesn't work because reverse is defined as returning a Seq. So when reverse is called it returns "abc" as a RichString. The equal operator when called on a RichString recognizes that the RichString "abc" is equal to the string "abc", but the equals method on Strings doesn't, as it's inherited from Java.
 
 We can see that the same problems will only occur in conversions between an Array and a similar RichArray type. So, this is not a feasible solution.
 
@@ -76,7 +76,11 @@ In the Scala 2.8 version of Scala Collections, there is a new collections framew
 Scala arrays are integrated into new framework via two implicit conversions. The first maps an Array of type T to an object of type ArrayOps, which will allow programmers to call any Seq method on an array. The returns of these methods will then yield arrays instead of ArrayOps values. And since the intermediate step, converting to ArrayOps, is so brief, modern VM's can reduce the calling overhead to essentially zero. 
 
         
->If the programmer wants to convert an array into a Seq, another implicit conversion is preformed: the conversion between an array and a WrappedArray. WrappedArrays “are mutable vectors that implement all vector operations in terms of a given Java array”. The operations on a WrappedArray then return a WrappedArray, instead of an Array like ArrayOps does. And then there is an implicit conversion between WrappedArray and Array. Both ArrayOps and WrappedArray inherit from ArrayLike, to avoid the duplication of common code, like operations. (http://docs.scala-lang.org/sips/completed/scala-2-8-arrays.html)
+If the programmer wants to convert an array into a Seq, another implicit conversion is preformed: the conversion between an array and a WrappedArray. WrappedArrays “are mutable vectors that implement all vector operations in terms of a given Java array”. <sup>[Odersky](http://docs.scala-lang.org/sips/completed/scala-2-8-arrays.html)</sup>
+
+
+The operations on a WrappedArray then return a WrappedArray, instead of an Array like ArrayOps does. And then there is an implicit conversion between WrappedArray and Array. Both ArrayOps and WrappedArray inherit from ArrayLike, to avoid the duplication of common code, like operations. 
+
         
 
 Given the two implicit conversions, there is a balancing as to which is called. The conversion to ArrayOps has precedence, but in some cases an array needs to be converted to a sequence, instead of a sequence method just being called on it. In that case, the WrappedArray conversion is used. This precedence is defined by the policy that: “When comparing two different applicable alternatives of an overloaded method or of an implicit, each method gets one point for having more specific arguments, and another point for being defined in a proper subclass. An alternative 'wins' over another if it gets a greater number of points in these two comparisons.” As ArrayOps is placed in the Predef object, and WrappedArray is in the LowPriorityImplicits class inherited from Predef, WrappedArray will only be used if it's definitely needed.
@@ -104,7 +108,7 @@ Using the ArrayOps and the WrappedArray conversions to integrate arrays into the
 How This Was Received
 =====================
 
-The overall response to the change in Scala arrays was positive.  While it is essentially impossible to please all members of any programming community with a language change, the implementation of arrays in Scala 2.8 was met with widespread approval. In a response to Matt Malones "The Mystery Of The Parameterized Array," Steve said,
+The overall response to the change in Scala arrays was positive.  While it is essentially impossible to please all members of any programming community with a language change, the implementation of arrays in Scala 2.8 was met with widespread approval. In a response to Malone's [blog](http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/) commenter Steve said,
 
 >July 12, 2011 at 7:55 am
 This seems to work now as expected. It even uses a primitive int array underneath, so toString produces “a: ArrayWrapper[Int] = [I@4723646″.
@@ -128,15 +132,16 @@ Here, we see the effect of the fact that the Scala 2.8 arrays are not Traversabl
 
 Despite this, the resounding reaction to the Scala 2.8 array implementation was that it managed to clear up a good majority of the issues that plagued the prior version's Boxed/Unboxed Array scheme. 
 
+___
 Works Cited
 =====================
 
-http://docs.scala-lang.org/sips/completed/scala-2-8-arrays.html
+**Martin Odersky** - http://docs.scala-lang.org/sips/completed/scala-2-8-arrays.html
 
-http://www.drmaciver.com/2008/06/scala-arrays/
+**Matt Malone** - http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/
 
-http://oldfashionedsoftware.com/2009/08/05/the-mystery-of-the-parameterized-array/
+**David MacIver** - http://www.drmaciver.com/2008/06/scala-arrays/
 
-http://www.drmaciver.com/repos/scala-arrays/sip-arrays.xhtml
+**David MacIver** - http://www.drmaciver.com/repos/scala-arrays/sip-arrays.xhtml
 
-http://daily-scala.blogspot.com/2010/04/scala-28-arrays-are-not-traversables.html
+**Jesse Eichar** - http://daily-scala.blogspot.com/2010/04/scala-28-arrays-are-not-traversables.html
