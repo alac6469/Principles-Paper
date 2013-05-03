@@ -81,6 +81,26 @@ Scala arrays are integrated into new framework via two implicit conversions. The
 
 Given the two implicit conversions, there is a balancing as to which is called. The conversion to ArrayOps has precedence, but in some cases an array needs to be converted to a sequence, instead of a sequence method just being called on it. In that case, the WrappedArray conversion is used. This precedence is defined by the policy that: “When comparing two different applicable alternatives of an overloaded method or of an implicit, each method gets one point for having more specific arguments, and another point for being defined in a proper subclass. An alternative 'wins' over another if it gets a greater number of points in these two comparisons.” As ArrayOps is placed in the Predef object, and WrappedArray is in the LowPriorityImplicits class inherited from Predef, WrappedArray will only be used if it's definitely needed.
 
+This only solves half the problem though. One can convert arrays between the Java primitive, and the Seq class, and use seq methods on it, but generic arrays still don't work. And that's where Manifests come in. Manifests are Scala's way of avoiding Java's type erasure. An instantiated Manifest is an object that represents a type. They are usually provided as an implicit parameter, by the compiler. In the case of arrays, they would represent what the type T in Array[T] was, depending on what it actually is at runtime. 
+
+Thus, when creating a function that contains a generic array as a parameter, one must also include the Manifest as an implicit parameter, or using a context-bound, as shown in the below example from Odersky's [SID](http://docs.scala-lang.org/sips/completed/scala-2-8-arrays.html):
+
+~~~~~
+def tabulate[T](len: Int, f: Int => T)(implicit m: ClassManifest[T]) = { 
+	val xs = new Array[T](len)
+	for (i <- 0 until len) xs(i) = f(i)
+	xs
+}
+
+// Or can do it context-bound like this:
+// def tabulate[T: ClassManifest](len: Int, f: Int => T) = ...
+~~~~~
+
+There is also the GenericArray class, which lets a programmer use a generic array without providing a Manifest for the type. This is accomplished by having all the elements of a GenericArray stored in an Array[AnyRef] which is represented as an Object[] array in Java. However, GenericArrays are slower, bigger, and are less easy to use with Java code, so passing a Manifest is preferred, when possible.
+
+Using the ArrayOps and the WrappedArray conversions to integrate arrays into the Scala Collection Hierarchy, and using Manifests/GenericArrays to allow for generic parameterized arrays as well, Scala 2.8 provides fast and fairly reliable arrays, as compared to the past.
+
+
 How This Was Received
 =====================
 
@@ -93,7 +113,7 @@ This seems to work now as expected. It even uses a primitive int array underneat
 
 Clearly, this user is happy with the fact that his code behaves as expected.
 
-While a large majority of users appreciated the improvement to arrays in Scala 2.8, there were certainly some people who found a few flaws in the new implementation. For instance, in Jesse Eicher's, Daily Scala, he wrote a blog post called "Scala 2.8 Arrays are not Traversables." In this post he points out many pros and also some cons on the new implementation of the Scala Array. As the title of the post infers, his main concern with the new Scala Arrays is that they are non-traversable. He shows this in an example:
+While a large majority of users appreciated the improvement to arrays in Scala 2.8, there were some people who found a few flaws in the new implementation. For instance, in Jesse Eicher's [Daily Scala](http://daily-scala.blogspot.com/2010/04/scala-28-arrays-are-not-traversables.html), he points out many pros and also some cons on the new implementation of the Scala Array. His main concern with the new Scala Arrays is that they are non-traversable. He shows this in the example below:
 
 ~~~~~
 scala> def x(t:Traversable[Int]) = t.isInstanceOf[Array[_]]
@@ -104,7 +124,9 @@ res24: Boolean = false
 
 ~~~~~
 
-Here, we see the effect of the fact that the Scala 2.8 arrays are non-traversable: Jesse Eicher received a *type mismatch* error.  Again, while he was pointing out this flaw, in his blog post he also discusses a number of benefits to the new implementation.  Once again, the resounding reaction to the Scala 2.8 array implementation was that it managed to clear up a good majority of the issues that the prior version was causing.  The writers of Scala certainly did an impressive job of pleasing the members of the Scala programming community.
+Here, we see the effect of the fact that the Scala 2.8 arrays are not Traversable: Jesse Eicher received a *type mismatch* error. This is a problem, if, say, you had a function that takes a Traversable and then you try to pattern match on it. As Arrays aren't Traversables, you'd have to match against a WrappedArray, which would convert the Array that was originally passed in. The code will still work, but if the conversion wasn't necessary, there could be performance issues when using a WrappedArray as opposed to the faster Array.
+
+Despite this, the resounding reaction to the Scala 2.8 array implementation was that it managed to clear up a good majority of the issues that plagued the prior version's Boxed/Unboxed Array scheme. 
 
 Works Cited
 =====================
